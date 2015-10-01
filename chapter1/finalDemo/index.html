@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script src="https://code.createjs.com/easeljs-0.8.1.min.js"></script>
+    <script src="https://code.createjs.com/tweenjs-0.6.1.min.js"></script>
+    <script src="https://code.createjs.com/soundjs-0.6.1.min.js"></script></head>
+    <script src="https://code.createjs.com/createjs-2015.05.21.min.js"></script>
+</head>
+
+<body onload="init()">
+
+<canvas id="canvas" width="1000" height="800" style="border: black solid 1px"></canvas>
+
+</body>
+
+<script>
+    var stage;
+    var queue;
+    function init() {
+        queue = new createjs.LoadQueue();
+        queue.installPlugin(createjs.Sound);
+        queue.addEventListener("complete", loadComplete);
+        queue.loadManifest([
+            {id:"butterfly", src:"images/butterfly.png"},
+            {id:"woosh", src:"sounds/woosh.mp3"},
+            {id:"chime", src:"sounds/chime.mp3"},
+            {id:"stone_horn", src:"sounds/stone_horn.mp3"},
+            {id:"spheric_bells", src:"sounds/spheric_bells.mp3"},
+            {id:"button1", src:"sounds/multimedia_button_click_001.mp3"},
+            {id:"drum", src:"sounds/native_drum_loop.mp3"}
+        ]);
+    }
+    function loadComplete() {
+        setupStage();
+        buildButterflies();
+    }
+    function setupStage() {
+        stage = new createjs.Stage(document.getElementById('canvas'));
+        createjs.Ticker.setFPS(60);
+        createjs.Ticker.addEventListener("tick", function(){
+            stage.update();
+        });
+    }
+    function buildButterflies() {
+        var img = queue.getResult("butterfly");
+        var i, sound, butterfly;
+        for (i = 0; i <4; i++) {
+            butterfly = new createjs.Bitmap(img);
+            butterfly.x = i * 200;
+            stage.addChild(butterfly);
+            createjs.Tween.get(butterfly).wait(i * 1000).to({y:100}, 1000, createjs.Ease.quadOut).call(butterflyComplete);
+            // sound = createjs.Sound.play('spheric_bells',createjs.Sound.INTERRUPT_NONE,i * 1000);
+            sound = createjs.Sound.play('button1',createjs.Sound.INTERRUPT_NONE,i * 1000);
+           sound.volume = 0.9;
+        }
+    }
+    // when it ends
+    function butterflyComplete(){
+        stage.removeChild(this);
+        if(!stage.getNumChildren()){
+            createjs.Sound.play('drum');
+        }
+    }
+    function handleTick(e) {
+        stage.update();
+    }
+</script>
+</html>
